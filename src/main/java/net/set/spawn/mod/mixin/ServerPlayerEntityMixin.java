@@ -42,7 +42,7 @@ public abstract class ServerPlayerEntityMixin {
         }
     }
 
-    @WrapOperation(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
+    @WrapOperation(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I", remap = false))
     private int setSpawn(Random random, int bounds, Operation<Integer> original, @Local(ordinal = 0) BlockPos worldSpawn, @Local(ordinal = 0) int spawnRadius, @Share("seed") LocalRef<Seed> seed, @Share("originalRandomResult") LocalRef<Integer> originalRandomResult) {
         int originalResult = original.call(random, bounds);
 
@@ -51,8 +51,11 @@ public abstract class ServerPlayerEntityMixin {
             return originalResult;
         }
 
-        // Transform x and z coordinates into correct Random#nextInt result.
-        int result = ((MathHelper.floor(seedObject.getX()) - worldSpawn.getX()) + spawnRadius) + ((MathHelper.floor(seedObject.getZ()) - worldSpawn.getZ()) + spawnRadius) * (spawnRadius * 2 + 1);
+        // Transform x and z coordinates into corresponding Random#nextInt result.
+        int spawnDiameter = spawnRadius * 2 + 1;
+        int x = MathHelper.floor(seedObject.getX());
+        int z = MathHelper.floor(seedObject.getZ());
+        int result = (x - worldSpawn.getX() + spawnRadius) + (z - worldSpawn.getZ() + spawnRadius) * spawnDiameter;
 
         if (result >= 0 && result < bounds) {
             // we save the original result in case the set spawn is invalid, see fallbackOnInvalidSpawn
@@ -70,6 +73,7 @@ public abstract class ServerPlayerEntityMixin {
         // and restores the original result of Random#nextInt
         if (p == 1 && originalRandomResult.get() != null) {
             o.set(originalRandomResult.get());
+            // setting originalRandomResult to null signals that SetSpawn is not trying to override the spawn anymore
             originalRandomResult.set(null);
             p = 0;
 
