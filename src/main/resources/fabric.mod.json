@@ -2,18 +2,24 @@
   "schemaVersion": 1,
   "id": "${mod_id}",
   "version": "${version}",
-
-  "name": "Set Spawn 1.16.1",
+  "name": "Set Spawn",
   "description": "Sets the player's spawnpoint in SSG to specified coordinates.",
   "authors": [
-    "bdamja",
+    {
+      "name": "bdamja",
+      "contact": {
+        "homepage": "https://github.com/bdamja"
+      }
+    }
+  ],
+  "contributors": [
     "Void_X_Walker",
     "jan-leila",
-    "RedLime"
+    "RedLime",
+    "contaria"
   ],
   "license": "LGPL-3.0-only",
   "icon": "assets/setspawnmod/icon.png",
-
   "environment": "*",
   "entrypoints": {
     "client": [
